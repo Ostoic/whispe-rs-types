@@ -1,0 +1,58 @@
+[package]
+name = "whispe-rs_types"
+version = "0.1.0"
+edition = "2021"
+crate-type = "lib"
+
+[features]
+default = []
+std = []
+nosym = ["bitflags/nosym"]
+
+[dependencies]
+obfstr = "0.4"
+
+[dependencies.ntapi]
+version = "0.4"
+features = ["impl-default"]
+default-features = false
+
+[dependencies.winapi]
+version = "0.3"
+features = ["cfg", "minwinbase", "windef", "ntsecapi"]
+# default-features = false
+
+[dependencies.bitflags]
+version = "1.3"
+default-features = false
+git = "https://github.com/Ostoic/bitflags"
+
+[dependencies.windows-sys]
+version = "0.45"
+features = [
+    # "Data_Xml_Dom",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Memory",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+]
+default-features = false
+
+[dependencies.bincode]
+version = "2.0.0-rc.2"
+features = ["derive"]
+git = "https://github.com/bincode-org/bincode"
+default-features = false
+optional = true
+
+[dependencies.widestring]
+version = "1"
+default-features = false
+
+[dependencies.num_enum]
+version = "0.5"
+default-features = false
+
+[dev-dependencies]
+anyhow = "1"

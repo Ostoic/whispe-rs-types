@@ -1,0 +1,5 @@
+[build]
+target = "x86_64-pc-windows-gnu"
+
+[env]
+OBFSTR_SEED="9354ccc4bcd926cd"
