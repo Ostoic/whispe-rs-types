@@ -51,7 +51,7 @@ fn test_stmts_strlen() {
 }
 
 use widestring::{U16CStr, Utf16Str};
-use windows_sys::Win32::Foundation::UNICODE_STRING;
+use winapi::shared::ntdef::UNICODE_STRING;
 
 #[inline]
 pub fn convert_unicode_unchecked(s: &UNICODE_STRING) -> Option<&Utf16Str> {
