@@ -50,7 +50,7 @@ fn test_stmts_strlen() {
     assert_eq!(x, 16);
 }
 
-use widestring::{utf16str, U16CStr, Utf16Str};
+use widestring::{U16CStr, Utf16Str};
 use windows_sys::Win32::Foundation::UNICODE_STRING;
 
 #[inline]
