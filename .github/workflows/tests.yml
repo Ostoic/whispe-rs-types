@@ -1,0 +1,30 @@
+name: Run tests
+on: push
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        features: ["std,bincode", "nosym", "alloc,bincode"]
+        targets: ["x86_64-pc-windows-gnu"]
+
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: nightly
+          target: x86_64-pc-windows-gnu
+          components: rust-src
+
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features=${{ matrix.features }} --target=${{ matrix.targets }}

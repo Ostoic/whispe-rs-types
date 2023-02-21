@@ -20,10 +20,10 @@ jobs:
           profile: minimal
           toolchain: nightly
           target: x86_64-pc-windows-gnu
-          components: clippy, rust-src
+          components: clippy
 
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --features=${{ matrix.features }} -Zbuild-std=core,alloc,panic_unwind,panic_abort,std
+          args: --features=${{ matrix.features }}
