@@ -9,8 +9,7 @@
     "rust-analyzer.check.overrideCommand": [
         "cargo",
         "clippy",
-        "-Zbuild-std",
-        "core,alloc,panic_unwind,panic_abort,std",
+        // "-Zbuild-std=core,alloc,panic_unwind,panic_abort,std",
         "--message-format=json-diagnostic-rendered-ansi"
     ],
 }

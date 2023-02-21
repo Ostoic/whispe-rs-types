@@ -105,7 +105,7 @@ impl<Other: IntoIterator<Item = char>> EqIgnoreAsciiCase<Other> for UnicodeStrin
 #[test]
 fn test_eq_ignore_ascii_case() {
     assert!("Bongour".chars().eq_ignore_ascii_case("bongour".chars()));
-    assert!(utf16str!("Testo")
+    assert!(widestring::utf16str!("Testo")
         .chars()
         .eq_ignore_ascii_case("testo".chars()));
     assert!("Bongour".eq_ignore_ascii_case("bongour".chars().as_str()));
