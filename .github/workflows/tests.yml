@@ -32,4 +32,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --lib --features=${{ matrix.features }}
+          args: --lib --target=${{ matrix.target }} --features=${{ matrix.features }}
