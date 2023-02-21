@@ -4,8 +4,8 @@ use winapi::shared::ntdef::NTSTATUS;
 // Todo: Determine if important statuses are missing
 #[repr(i32)]
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive)]
 pub enum NtStatus {
     STATUS_GUARD_PAGE_VIOLATION = 0x80000001u32 as _,
     STATUS_DATATYPE_MISALIGNMENT = 0x80000002u32 as _,
@@ -2399,9 +2399,33 @@ pub enum NtStatus {
     STATUS_VSM_DMA_PROTECTION_NOT_IN_USE = 0xC0450001u32 as _,
 }
 
+/// These were implemented manualy because the derive proc macro causes a compiler bug to occur.
+/// Manual implementation of bincode::Encode
+#[cfg(feature = "bincode")]
+impl bincode::Encode for NtStatus {
+    fn encode<E: bincode::enc::Encoder>(
+        &self,
+        encoder: &mut E,
+    ) -> Result<(), bincode::error::EncodeError> {
+        bincode::Encode::encode(&self.bits(), encoder)
+    }
+}
+
+/// Manual implementation of bincode::Decode
+#[cfg(feature = "bincode")]
+impl bincode::Decode for NtStatus {
+    fn decode<D: bincode::de::Decoder>(
+        decoder: &mut D,
+    ) -> Result<Self, bincode::error::DecodeError> {
+        let decoded_u32 = u32::decode(decoder)?;
+        Ok(unsafe { core::mem::transmute(decoded_u32) })
+    }
+}
+
 #[repr(u32)]
-#[derive(Copy, Clone, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive)]
 pub enum NtStatusKind {
     Success = 0,
     Info = 1,
@@ -2457,39 +2481,67 @@ impl TryFrom<u32> for NtStatus {
     }
 }
 
-#[test]
 #[cfg(test)]
-#[cfg(not(feature = "nosym"))]
-fn test_ntstatus_semantics() {
-    assert!(NtStatus::STATUS_INVALID_HANDLE.is_error());
-    assert!(NtStatus::STATUS_INVALID_ACCOUNT_NAME.is_error());
-    assert!(NtStatus::STATUS_ACCESS_DENIED.is_error());
-    assert!(NtStatus::STATUS_NOT_SUPPORTED.is_error());
-    assert!(NtStatus::STATUS_SUCCESS.is_success());
-    assert!(NtStatus::STATUS_DATATYPE_MISALIGNMENT.is_warning());
-    assert!(!NtStatus::STATUS_DATATYPE_MISALIGNMENT.is_success());
-    assert_eq!(
-        NtStatus::STATUS_ACCESS_DENIED.kind(),
-        Some(NtStatusKind::Error)
-    );
-    assert_eq!(NtStatus::STATUS_SUCCESS.kind(), Some(NtStatusKind::Success));
-}
+mod tests {
+    use crate::{ntstatus::NtStatusKind, NtStatus};
 
-#[test]
-#[cfg(test)]
-#[cfg(feature = "alloc")]
-#[cfg(not(feature = "nosym"))]
-fn test_ntstatus_to_string() {
-    use anyhow::__private::format;
-    let status = NtStatus::STATUS_ACCESS_DENIED;
-    assert_eq!(format!("{:?}", status), "STATUS_ACCESS_DENIED");
-}
+    #[test]
+    #[cfg(not(feature = "nosym"))]
+    fn test_ntstatus_semantics() {
+        assert!(NtStatus::STATUS_INVALID_HANDLE.is_error());
+        assert!(NtStatus::STATUS_INVALID_ACCOUNT_NAME.is_error());
+        assert!(NtStatus::STATUS_ACCESS_DENIED.is_error());
+        assert!(NtStatus::STATUS_NOT_SUPPORTED.is_error());
+        assert!(NtStatus::STATUS_SUCCESS.is_success());
+        assert!(NtStatus::STATUS_DATATYPE_MISALIGNMENT.is_warning());
+        assert!(!NtStatus::STATUS_DATATYPE_MISALIGNMENT.is_success());
+        assert_eq!(
+            NtStatus::STATUS_ACCESS_DENIED.kind(),
+            Some(NtStatusKind::Error)
+        );
+        assert_eq!(NtStatus::STATUS_SUCCESS.kind(), Some(NtStatusKind::Success));
+    }
 
-#[test]
-#[cfg(test)]
-#[cfg(not(feature = "nosym"))]
-fn test_ntstatus_try_from_primitive() {
-    let raw_status = 0xC0000008u32;
-    let status = NtStatus::try_from(raw_status).expect("status");
-    assert_eq!(status, NtStatus::STATUS_INVALID_HANDLE);
+    #[test]
+    #[cfg(feature = "alloc")]
+    #[cfg(not(feature = "nosym"))]
+    fn test_ntstatus_to_string() {
+        use anyhow::__private::format;
+        assert_eq!(
+            format!("{:?}", NtStatus::STATUS_ACCESS_DENIED),
+            "STATUS_ACCESS_DENIED"
+        );
+
+        assert_eq!(
+            format!("{:?}", NtStatus::DBG_NO_STATE_CHANGE),
+            "DBG_NO_STATE_CHANGE"
+        );
+
+        assert_eq!(
+            format!("{:?}", NtStatus::RPC_NT_BAD_STUB_DATA),
+            "RPC_NT_BAD_STUB_DATA"
+        );
+    }
+
+    #[test]
+    #[cfg(not(feature = "nosym"))]
+    fn test_ntstatus_try_from_primitive() {
+        let raw_status = 0xC0000008u32;
+        let status = NtStatus::try_from(raw_status).expect("status");
+        assert_eq!(status, NtStatus::STATUS_INVALID_HANDLE);
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    #[cfg(feature = "bincode")]
+    fn test_ntstatus_bincode() -> anyhow::Result<()> {
+        let config = bincode::config::standard();
+        let access_denied = NtStatus::STATUS_ACCESS_DENIED;
+        let status_bytes = bincode::encode_to_vec(access_denied, config)?;
+        let (decoded_status, _): (NtStatus, usize) =
+            bincode::decode_from_slice(&status_bytes[..], config)?;
+
+        assert_eq!(decoded_status, access_denied);
+        Ok(())
+    }
 }

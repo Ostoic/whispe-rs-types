@@ -5,7 +5,7 @@ jobs:
   check:
     strategy:
       matrix:
-        features: ["std", "nosym"]
+        features: ["std", "nosym", "default"]
 
     name: Run clippy
     runs-on: ubuntu-latest

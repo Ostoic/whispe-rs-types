@@ -12,7 +12,7 @@
 #[allow(unused_imports)]
 extern crate alloc;
 
-use core::{ffi::c_void, ptr::NonNull, time::Duration};
+use core::{ffi::c_void, ptr::NonNull};
 
 pub type Handle = *mut c_void;
 pub type NonNullHandle = NonNull<c_void>;
@@ -68,36 +68,12 @@ pub trait FromRawHandle {
     unsafe fn from_raw_handle(handle: NonNullHandle) -> Self;
 }
 
-#[derive(Clone, Copy)]
-pub struct NativeDuration(LARGE_INTEGER);
-
-impl NativeDuration {
-    #[inline]
-    pub fn as_ptr(&self) -> *const LARGE_INTEGER {
-        &self.0 as _
-    }
-}
-
-impl AsRef<LARGE_INTEGER> for NativeDuration {
-    #[inline]
-    fn as_ref(&self) -> &LARGE_INTEGER {
-        &self.0
-    }
-}
-
-impl From<Duration> for NativeDuration {
-    #[inline]
-    fn from(x: Duration) -> Self {
-        let mut interval = LARGE_INTEGER::default();
-        unsafe { *interval.QuadPart_mut() = -(x.as_millis() as i64) * 10000 };
-        Self(interval)
-    }
-}
-
 pub mod ntapi_ext;
 pub mod ntstatus;
 pub use ntstatus::NtStatus;
-use winapi::um::winnt::LARGE_INTEGER;
+
+pub mod duration;
+pub use duration::NativeDuration;
 
 pub mod types {
     pub use ntapi::*;

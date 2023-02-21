@@ -1,4 +1,6 @@
 use core::{iter::zip, ops::Range};
+use widestring::{U16CStr, Utf16Str};
+use winapi::shared::ntdef::UNICODE_STRING;
 
 #[inline]
 pub const fn interp(x: u32, range1: Range<u32>, range2: Range<u32>) -> u32 {
@@ -10,15 +12,6 @@ pub const fn interp(x: u32, range1: Range<u32>, range2: Range<u32>) -> u32 {
     range2.start + offset
 }
 
-#[test]
-#[cfg(test)]
-fn test_interp() {
-    assert_eq!(4, interp(2, 0..4, 0..8));
-    assert_eq!(2000, interp(1000, 0..4000, 0..8000));
-    assert_eq!(9, interp(1, 1..6, 9..11));
-    assert_eq!(3, interp(4, 1..6, 0..5));
-}
-
 #[inline(always)]
 #[warn(dead_code)]
 pub const fn min(x: usize, y: usize) -> usize {
@@ -28,31 +21,6 @@ pub const fn min(x: usize, y: usize) -> usize {
     }
 }
 
-#[cfg(test)]
-#[test]
-fn test_const_min() {
-    assert_eq!(min(10, 11), 10);
-    assert_eq!(min(11, 10), 10);
-}
-
-#[macro_export]
-macro_rules! __stmts_strlen {
-    ($($stmt:stmt,)*) => {{
-        0usize $(+ stringify!($stmt).len())*
-    }}
-}
-
-#[cfg(test)]
-#[test]
-fn test_stmts_strlen() {
-    let x = crate::__stmts_strlen!("hello", "there",);
-
-    assert_eq!(x, 16);
-}
-
-use widestring::{U16CStr, Utf16Str};
-use winapi::shared::ntdef::UNICODE_STRING;
-
 #[inline]
 pub fn convert_unicode_unchecked(s: &UNICODE_STRING) -> Option<&Utf16Str> {
     unsafe { U16CStr::from_ptr_truncate(s.Buffer as _, s.Length as _) }
@@ -60,7 +28,37 @@ pub fn convert_unicode_unchecked(s: &UNICODE_STRING) -> Option<&Utf16Str> {
         .ok()
 }
 
-pub struct UnicodeString(pub UNICODE_STRING);
+#[repr(transparent)]
+#[derive(Clone, Copy)]
+pub struct UnicodeString(UNICODE_STRING);
+
+#[cfg(not(feature = "nosym"))]
+impl core::fmt::Debug for UnicodeString {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let c_str = unsafe { U16CStr::from_ptr(self.0.Buffer, self.0.Length as _) };
+
+        c_str
+            .map(Utf16Str::from_ucstr)
+            .map_err(|_| core::fmt::Error)?
+            .fmt(f)
+    }
+}
+
+#[cfg(not(feature = "nosym"))]
+impl core::fmt::Display for UnicodeString {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        <Self as core::fmt::Debug>::fmt(self, f)
+    }
+}
+
+impl<'a> TryFrom<UnicodeString> for &'a Utf16Str {
+    type Error = widestring::error::Utf16Error;
+
+    fn try_from(value: UnicodeString) -> Result<Self, Self::Error> {
+        let c_str = unsafe { U16CStr::from_ptr_unchecked(value.0.Buffer, value.0.Length as _) };
+        Utf16Str::from_ucstr(c_str)
+    }
+}
 
 impl From<UNICODE_STRING> for UnicodeString {
     #[inline]
@@ -102,11 +100,33 @@ impl<Other: IntoIterator<Item = char>> EqIgnoreAsciiCase<Other> for UnicodeStrin
     }
 }
 
-#[test]
-fn test_eq_ignore_ascii_case() {
-    assert!("Bongour".chars().eq_ignore_ascii_case("bongour".chars()));
-    assert!(widestring::utf16str!("Testo")
-        .chars()
-        .eq_ignore_ascii_case("testo".chars()));
-    assert!("Bongour".eq_ignore_ascii_case("bongour".chars().as_str()));
+#[cfg(test)]
+mod tests {
+    use crate::util::{interp, EqIgnoreAsciiCase};
+
+    #[test]
+    fn test_eq_ignore_ascii_case() {
+        assert!("Bongour".chars().eq_ignore_ascii_case("bongour".chars()));
+        assert!(widestring::utf16str!("Testo")
+            .chars()
+            .eq_ignore_ascii_case("testo".chars()));
+
+        assert!("Bongour".eq_ignore_ascii_case("bongour".chars().as_str()));
+    }
+
+    #[test]
+    fn test_interp() {
+        assert_eq!(4, interp(2, 0..4, 0..8));
+        assert_eq!(2000, interp(1000, 0..4000, 0..8000));
+        assert_eq!(9, interp(1, 1..6, 9..11));
+        assert_eq!(3, interp(4, 1..6, 0..5));
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_const_min() {
+        use crate::util::min;
+        assert_eq!(min(10, 11), 10);
+        assert_eq!(min(11, 10), 10);
+    }
 }

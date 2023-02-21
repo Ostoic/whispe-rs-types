@@ -1,5 +1,8 @@
 ///
-use winapi::shared::{ntdef::{HANDLE, LIST_ENTRY, PVOID, BOOLEAN, UNICODE_STRING, SHORT}, minwindef::ULONG};
+use winapi::shared::{
+    minwindef::ULONG,
+    ntdef::{BOOLEAN, HANDLE, LIST_ENTRY, PVOID, SHORT, UNICODE_STRING},
+};
 use winapi::STRUCT;
 
 STRUCT! {

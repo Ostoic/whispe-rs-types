@@ -1,0 +1,9 @@
+# [tasks.format]
+# install_crate = "rustfmt"
+# command = "cargo"
+# args = ["fmt"]
+
+# [tasks.test]
+# command = "cargo"
+# args = ["+nightly", "test", "--lib"]
+
