@@ -68,11 +68,18 @@ pub trait FromRawHandle {
     unsafe fn from_raw_handle(handle: NonNullHandle) -> Self;
 }
 
+#[cfg(target_os = "windows")]
 pub mod ntapi_ext;
+
+#[cfg(target_os = "windows")]
 pub mod ntstatus;
+#[cfg(target_os = "windows")]
 pub use ntstatus::NtStatus;
 
+#[cfg(target_os = "windows")]
 pub mod duration;
+
+#[cfg(target_os = "windows")]
 pub use duration::NativeDuration;
 
 pub mod types {
