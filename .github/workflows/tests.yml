@@ -15,7 +15,7 @@ jobs:
         target: [x86_64-pc-windows-gnu]
 
     name: Run tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
