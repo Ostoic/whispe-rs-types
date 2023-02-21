@@ -1,12 +1,15 @@
 name: Run tests
 on: push
+  # pull_request:
+  #   branches: 
+  #     - main
 
 jobs:
   check:
     strategy:
       matrix:
         features: ["std,bincode", "nosym", "alloc,bincode"]
-        targets: ["x86_64-pc-windows-gnu"]
+        target: ["x86_64-pc-windows-gnu"]
 
     name: Run tests
     runs-on: ubuntu-latest
@@ -20,11 +23,10 @@ jobs:
           override: true
           profile: minimal
           toolchain: nightly
-          target: x86_64-pc-windows-gnu
-          components: rust-src
+          target: ${{ matrix.target }}
 
-      - name: Run cargo clippy
+      - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --features=${{ matrix.features }} --target=${{ matrix.targets }}
+          args: --features=${{ matrix.features }} --target=${{ matrix.target }} --lib
