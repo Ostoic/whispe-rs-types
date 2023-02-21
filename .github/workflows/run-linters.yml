@@ -5,7 +5,7 @@ jobs:
   check:
     strategy:
       matrix:
-        features: ["std", "nosym", "default"]
+        features: ["std,bincode", "nosym", "alloc,bincode"]
 
     name: Run clippy
     runs-on: ubuntu-latest
