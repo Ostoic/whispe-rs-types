@@ -18,7 +18,7 @@ pub type Handle = *mut c_void;
 pub type NonNullHandle = NonNull<c_void>;
 
 pub const CURRENT_PROCESS: NonNullHandle =
-unsafe { NonNullHandle::new(-1isize as _).unwrap_unchecked() };
+    unsafe { NonNullHandle::new(-1isize as _).unwrap_unchecked() };
 
 pub const CURRENT_THREAD: NonNullHandle =
     unsafe { NonNullHandle::new(-2isize as _).unwrap_unchecked() };
