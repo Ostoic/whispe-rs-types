@@ -5,8 +5,9 @@ edition = "2021"
 crate-type = "lib"
 
 [features]
-default = []
-std = []
+default = ["alloc"]
+std = ["alloc"]
+alloc = []
 nosym = ["bitflags/nosym"]
 
 [dependencies]
@@ -19,7 +20,7 @@ default-features = false
 
 [dependencies.winapi]
 version = "0.3"
-features = ["cfg", "minwinbase", "windef", "ntsecapi"]
+features = ["minwinbase", "windef"]
 # default-features = false
 
 [dependencies.bitflags]
@@ -30,12 +31,8 @@ git = "https://github.com/Ostoic/bitflags"
 [dependencies.windows-sys]
 version = "0.45"
 features = [
-    # "Data_Xml_Dom",
     "Win32_Foundation",
-    "Win32_Security",
-    "Win32_System_Memory",
-    "Win32_System_Threading",
-    "Win32_UI_WindowsAndMessaging",
+    # "Win32_UI_WindowsAndMessaging",
 ]
 default-features = false
 

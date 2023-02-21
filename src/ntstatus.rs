@@ -2477,9 +2477,10 @@ fn test_ntstatus_semantics() {
 
 #[test]
 #[cfg(test)]
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 #[cfg(not(feature = "nosym"))]
 fn test_ntstatus_to_string() {
+    use anyhow::__private::format;
     let status = NtStatus::STATUS_ACCESS_DENIED;
     assert_eq!(format!("{:?}", status), "STATUS_ACCESS_DENIED");
 }
