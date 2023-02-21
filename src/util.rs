@@ -31,10 +31,11 @@ pub fn convert_unicode_unchecked(s: &UNICODE_STRING) -> Option<&Utf16Str> {
         .ok()
 }
 
+// TODO: Consider making .0 private and providing conversions
 #[cfg(target_os = "windows")]
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct UnicodeString(UNICODE_STRING);
+pub struct UnicodeString(pub UNICODE_STRING);
 
 #[cfg(not(feature = "nosym"))]
 #[cfg(target_os = "windows")]
