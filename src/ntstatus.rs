@@ -5,7 +5,8 @@ use winapi::shared::ntdef::NTSTATUS;
 #[repr(i32)]
 #[allow(non_camel_case_types)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[derive(Copy, Clone, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive)]
+#[cfg_attr(feature = "try_from", derive(IntoPrimitive, TryFromPrimitive))]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum NtStatus {
     STATUS_GUARD_PAGE_VIOLATION = 0x80000001u32 as _,
     STATUS_DATATYPE_MISALIGNMENT = 0x80000002u32 as _,
@@ -2472,6 +2473,7 @@ impl NtStatus {
     }
 }
 
+#[cfg(feature = "try_from")]
 impl TryFrom<u32> for NtStatus {
     type Error = <NtStatus as TryFrom<NTSTATUS>>::Error;
 
@@ -2525,6 +2527,7 @@ mod tests {
 
     #[test]
     #[cfg(not(feature = "nosym"))]
+    #[cfg(feature = "try_from")]
     fn test_ntstatus_try_from_primitive() {
         let raw_status = 0xC0000008u32;
         let status = NtStatus::try_from(raw_status).expect("status");

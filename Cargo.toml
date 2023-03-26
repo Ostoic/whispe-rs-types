@@ -8,7 +8,8 @@ crate-type = "lib"
 default = ["alloc"]
 std = ["alloc", "bincode?/std"]
 alloc = ["bincode?/alloc"]
-nosym = ["bitflags/nosym"]
+try_from = []
+nosym = []
 
 [dependencies]
 obfstr = "0.4"
@@ -24,9 +25,8 @@ features = ["minwinbase", "windef"]
 # default-features = false
 
 [dependencies.bitflags]
-version = "1.3"
+version = "2.0"
 default-features = false
-git = "https://github.com/Ostoic/bitflags"
 
 [dependencies.windows-sys]
 version = "0.45"
@@ -53,4 +53,3 @@ default-features = false
 
 [dev-dependencies]
 anyhow = "1"
-# kani-verifier = "0.21"
