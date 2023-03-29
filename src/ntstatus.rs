@@ -2476,15 +2476,15 @@ impl NtStatus {
     }
 }
 
-#[cfg(feature = "unsafe_try_from")]
-impl TryFrom<u32> for NtStatus {
-    type Error = ();
+// #[cfg(feature = "unsafe_try_from")]
+// impl TryFrom<u32> for NtStatus {
+//     type Error = ();
 
-    #[inline(always)]
-    fn try_from(value: u32) -> Result<Self, Self::Error> {
-        Ok(unsafe { core::mem::transmute(value as NTSTATUS) })
-    }
-}
+//     #[inline(always)]
+//     fn try_from(value: u32) -> Result<Self, Self::Error> {
+//         Ok(unsafe { core::mem::transmute(value as NTSTATUS) })
+//     }
+// }
 
 #[cfg(not(feature = "unsafe_try_from"))]
 impl TryFrom<u32> for NtStatus {
@@ -2493,6 +2493,14 @@ impl TryFrom<u32> for NtStatus {
     #[inline(always)]
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         Self::try_from(value as NTSTATUS)
+    }
+}
+
+#[cfg(feature = "unsafe_try_from")]
+impl From<u32> for NtStatus {
+    #[inline(always)]
+    fn from(value: u32) -> Self {
+        unsafe { core::mem::transmute(value as NTSTATUS) }
     }
 }
 
@@ -2546,7 +2554,11 @@ mod tests {
         assert_eq!(status, NtStatus::STATUS_INVALID_HANDLE);
 
         let status = NtStatus::try_from(0xC00A000Du32).expect("0xC00A000Du32");
-        assert_eq!(status, NtStatus::STATUS_CTX_MODEM_RESPONSE_NO_DIALTONE)
+        assert_eq!(status, NtStatus::STATUS_CTX_MODEM_RESPONSE_NO_DIALTONE);
+
+        let raw_status = 0xC0290046u32;
+        let status: NtStatus = raw_status.into();
+        assert_eq!(status, NtStatus::STATUS_TPM_NOT_FULLWRITE)
     }
 
     #[test]
