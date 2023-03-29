@@ -8,7 +8,7 @@ crate-type = "lib"
 default = ["alloc"]
 std = ["alloc", "bincode?/std"]
 alloc = ["bincode?/alloc"]
-unsafe_try_from = []
+unsafe_conversions = []
 nosym = []
 
 [dependencies]

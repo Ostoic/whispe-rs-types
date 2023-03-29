@@ -6,7 +6,7 @@ use winapi::shared::ntdef::NTSTATUS;
 #[allow(non_camel_case_types)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[cfg_attr(
-    not(feature = "unsafe_try_from"),
+    not(feature = "unsafe_conversions"),
     derive(IntoPrimitive, TryFromPrimitive)
 )]
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
@@ -2476,7 +2476,7 @@ impl NtStatus {
     }
 }
 
-// #[cfg(feature = "unsafe_try_from")]
+// #[cfg(feature = "unsafe_conversions")]
 // impl TryFrom<u32> for NtStatus {
 //     type Error = ();
 
@@ -2486,7 +2486,7 @@ impl NtStatus {
 //     }
 // }
 
-#[cfg(not(feature = "unsafe_try_from"))]
+#[cfg(not(feature = "unsafe_conversions"))]
 impl TryFrom<u32> for NtStatus {
     type Error = <NtStatus as TryFrom<NTSTATUS>>::Error;
 
@@ -2496,7 +2496,7 @@ impl TryFrom<u32> for NtStatus {
     }
 }
 
-#[cfg(feature = "unsafe_try_from")]
+#[cfg(feature = "unsafe_conversions")]
 impl From<u32> for NtStatus {
     #[inline(always)]
     fn from(value: u32) -> Self {
@@ -2504,10 +2504,26 @@ impl From<u32> for NtStatus {
     }
 }
 
-#[cfg(feature = "unsafe_try_from")]
+#[cfg(feature = "unsafe_conversions")]
 impl From<i32> for NtStatus {
     #[inline(always)]
     fn from(value: i32) -> Self {
+        unsafe { core::mem::transmute(value as NTSTATUS) }
+    }
+}
+
+#[cfg(feature = "unsafe_conversions")]
+impl From<NtStatus> for u32 {
+    #[inline(always)]
+    fn from(value: NtStatus) -> Self {
+        unsafe { core::mem::transmute(value as NTSTATUS) }
+    }
+}
+
+#[cfg(feature = "unsafe_conversions")]
+impl From<NtStatus> for i32 {
+    #[inline(always)]
+    fn from(value: NtStatus) -> Self {
         unsafe { core::mem::transmute(value as NTSTATUS) }
     }
 }
@@ -2531,6 +2547,9 @@ mod tests {
             Some(NtStatusKind::Error)
         );
         assert_eq!(NtStatus::STATUS_SUCCESS.kind(), Some(NtStatusKind::Success));
+
+        #[cfg(feature = "unsafe_conversions")]
+        let _: u32 = NtStatus::STATUS_TPM_NOT_FULLWRITE.into();
     }
 
     #[test]
@@ -2557,15 +2576,13 @@ mod tests {
     #[test]
     #[cfg(not(feature = "nosym"))]
     fn test_ntstatus_try_from_primitive() {
-        let raw_status = 0xC0000008u32;
-        let status = NtStatus::try_from(raw_status).expect("status");
+        let status = NtStatus::try_from(0xC0000008u32).expect("0xC0000008u32");
         assert_eq!(status, NtStatus::STATUS_INVALID_HANDLE);
 
         let status = NtStatus::try_from(0xC00A000Du32).expect("0xC00A000Du32");
         assert_eq!(status, NtStatus::STATUS_CTX_MODEM_RESPONSE_NO_DIALTONE);
 
-        let raw_status = 0xC0290046u32;
-        let status: NtStatus = raw_status.into();
+        let status = NtStatus::try_from(0xC0290046u32).expect("0xC00A000Du32");
         assert_eq!(status, NtStatus::STATUS_TPM_NOT_FULLWRITE)
     }
 
