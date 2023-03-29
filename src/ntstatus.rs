@@ -5,7 +5,10 @@ use winapi::shared::ntdef::NTSTATUS;
 #[repr(i32)]
 #[allow(non_camel_case_types)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "try_from", derive(IntoPrimitive, TryFromPrimitive))]
+#[cfg_attr(
+    not(feature = "unsafe_try_from"),
+    derive(IntoPrimitive, TryFromPrimitive)
+)]
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum NtStatus {
     STATUS_GUARD_PAGE_VIOLATION = 0x80000001u32 as _,
@@ -2473,7 +2476,17 @@ impl NtStatus {
     }
 }
 
-#[cfg(feature = "try_from")]
+#[cfg(feature = "unsafe_try_from")]
+impl TryFrom<u32> for NtStatus {
+    type Error = ();
+
+    #[inline(always)]
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        Ok(unsafe { core::mem::transmute(value as NTSTATUS) })
+    }
+}
+
+#[cfg(not(feature = "unsafe_try_from"))]
 impl TryFrom<u32> for NtStatus {
     type Error = <NtStatus as TryFrom<NTSTATUS>>::Error;
 
@@ -2527,11 +2540,13 @@ mod tests {
 
     #[test]
     #[cfg(not(feature = "nosym"))]
-    #[cfg(feature = "try_from")]
     fn test_ntstatus_try_from_primitive() {
         let raw_status = 0xC0000008u32;
         let status = NtStatus::try_from(raw_status).expect("status");
         assert_eq!(status, NtStatus::STATUS_INVALID_HANDLE);
+
+        let status = NtStatus::try_from(0xC00A000Du32).expect("0xC00A000Du32");
+        assert_eq!(status, NtStatus::STATUS_CTX_MODEM_RESPONSE_NO_DIALTONE)
     }
 
     #[test]
