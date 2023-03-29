@@ -2504,6 +2504,14 @@ impl From<u32> for NtStatus {
     }
 }
 
+#[cfg(feature = "unsafe_try_from")]
+impl From<i32> for NtStatus {
+    #[inline(always)]
+    fn from(value: u32) -> Self {
+        unsafe { core::mem::transmute(value as NTSTATUS) }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{ntstatus::NtStatusKind, NtStatus};
