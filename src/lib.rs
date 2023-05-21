@@ -13,6 +13,9 @@
 #[allow(unused_imports)]
 extern crate alloc;
 
+#[cfg(not(windows))]
+compile_error!("whispe-rs_types only supports Windows!");
+
 use core::{ffi::c_void, ptr::NonNull};
 
 pub type Handle = *mut c_void;
@@ -69,18 +72,14 @@ pub trait FromRawHandle {
     unsafe fn from_raw_handle(handle: NonNullHandle) -> Self;
 }
 
-#[cfg(target_os = "windows")]
 pub mod ntapi_ext;
 
-#[cfg(target_os = "windows")]
 pub mod ntstatus;
-#[cfg(target_os = "windows")]
+
 pub use ntstatus::NtStatus;
 
-#[cfg(target_os = "windows")]
 pub mod duration;
 
-#[cfg(target_os = "windows")]
 pub use duration::NativeDuration;
 
 pub mod types {

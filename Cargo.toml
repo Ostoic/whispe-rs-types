@@ -2,7 +2,9 @@
 name = "whispe-rs_types"
 version = "0.1.0"
 edition = "2021"
-crate-type = "lib"
+
+# [lib]
+# name = "whispe_rs_types"
 
 [features]
 default = ["alloc"]
