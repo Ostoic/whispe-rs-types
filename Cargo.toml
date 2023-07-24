@@ -1,10 +1,7 @@
 [package]
 name = "whispe-rs_types"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-
-# [lib]
-# name = "whispe_rs_types"
 
 [features]
 default = ["alloc"]
@@ -31,7 +28,7 @@ version = "2.0"
 default-features = false
 
 [dependencies.windows-sys]
-version = "0.45"
+version = "0.48"
 features = [
     "Win32_Foundation",
     # "Win32_UI_WindowsAndMessaging",
@@ -50,7 +47,7 @@ version = "1"
 default-features = false
 
 [dependencies.num_enum]
-version = "0.5"
+version = "0.6"
 default-features = false
 
 [dev-dependencies]
