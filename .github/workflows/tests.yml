@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         features: ["std", "nosym", "alloc"]
-        target: [x86_64-pc-windows-gnu, ]
+        target: [x86_64-pc-windows-gnu]
 
     name: Run tests
     runs-on: self-hosted
@@ -23,19 +23,19 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install $CARGO_NIGHTLY_TOOLCHAIN toolchain
+      - name: Install nightly toolchain
         uses: actions-rs/toolchain@v1
         with:
           override: true
           profile: minimal
-          toolchain: $CARGO_NIGHTLY_TOOLCHAIN
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
           target: ${{ matrix.target }}
 
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          toolchain: $CARGO_NIGHTLY_TOOLCHAIN
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
           args: --target=${{ matrix.target }} --features=${{ matrix.features }}
   test-linux:
     strategy:
@@ -49,17 +49,17 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install $CARGO_NIGHTLY_TOOLCHAIN toolchain
+      - name: Install nightly toolchain
         uses: actions-rs/toolchain@v1
         with:
           override: true
           profile: minimal
-          toolchain: $CARGO_NIGHTLY_TOOLCHAIN
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
           target: ${{ matrix.target }}
 
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          toolchain: $CARGO_NIGHTLY_TOOLCHAIN
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
           args: --target=${{ matrix.target }} --features=${{ matrix.features }}
