@@ -14,7 +14,7 @@ jobs:
   test-windows:
     strategy:
       matrix:
-        features: ["std", "nosym", "alloc"]
+        features: ["std", "nosym", "alloc", "unsafe_conversions"]
         target: [x86_64-pc-windows-gnu]
 
     name: Run tests
@@ -40,7 +40,7 @@ jobs:
   test-linux:
     strategy:
       matrix:
-        features: ["std", "nosym", "alloc"]
+        features: ["std", "nosym", "alloc", "unsafe_conversions"]
         target: [x86_64-unknown-linux-gnu]
 
     name: Run tests

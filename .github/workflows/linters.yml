@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         target: [x86_64-pc-windows-gnu, x86_64-unknown-linux-gnu]
-        features: ["std", "nosym", "alloc"]
+        features: ["std", "nosym", "alloc", "unsafe_conversions"]
 
     name: Run clippy
     runs-on: ubuntu-latest
