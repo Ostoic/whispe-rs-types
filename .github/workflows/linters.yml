@@ -33,7 +33,6 @@ jobs:
         with:
           command: fmt
           toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
-          args: --target=${{ matrix.target }}
 
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
