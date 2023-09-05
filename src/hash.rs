@@ -42,7 +42,6 @@ pub fn hash_utf16str(s: &widestring::Utf16Str) -> u32 {
 }
 
 /// Modified from the obfstr library
-#[cfg_attr(feature = "aggressive-inline", inline(always))]
 pub const fn djb2(s: &[u8], range: Range<usize>, step: usize) -> u32 {
     let mut result = 3581u32;
     let mut i = range.start; // Starts at the 3rd character
@@ -88,7 +87,6 @@ fn test_sdbm_impl() {
 }
 
 /// ElfHash (32-bit variant) hash function.
-#[cfg_attr(feature = "aggressive-inline", inline(always))]
 #[warn(dead_code)]
 pub const fn seeded_elf(s: &[u8], range: Range<usize>, step: usize) -> u32 {
     let mut result: u32 = obfstr::random!(u32)
