@@ -1,10 +1,10 @@
 [package]
 name = "whispe-rs-types"
-version = "0.3.0"
+version = "0.2.1"
 edition = "2021"
 
 [features]
-default = ["alloc", "win"]
+default = ["alloc"]
 std = ["alloc"]
 alloc = []
 unsafe_conversions = []
