@@ -78,9 +78,9 @@ pub mod ntstatus;
 
 pub use ntstatus::NtStatus;
 
-pub mod duration;
+pub mod native_duration;
 
-pub use duration::NativeDuration;
+pub use native_duration::NativeDuration;
 
 pub mod types {
     pub use ntapi::*;

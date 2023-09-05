@@ -1,3 +1,5 @@
+#![cfg(windows)]
+
 use core::time::Duration;
 
 use winapi::um::winnt::LARGE_INTEGER;
