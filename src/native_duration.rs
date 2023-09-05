@@ -100,21 +100,6 @@ mod tests {
     use crate::NativeDuration;
 
     #[test]
-    #[cfg(feature = "std")]
-    #[cfg(feature = "bincode")]
-    fn test_duration_bincode() -> anyhow::Result<()> {
-        let bincode_config = bincode::config::standard();
-
-        let duration = NativeDuration::from(Duration::from_secs(2));
-        let duration_bytes = bincode::encode_to_vec(&duration, bincode_config)?;
-        let (decoded_duration, _): (NativeDuration, usize) =
-            bincode::decode_from_slice(&duration_bytes, bincode_config)?;
-
-        assert_eq!(decoded_duration, duration);
-        Ok(())
-    }
-
-    #[test]
     fn test_duration_conversions() {
         let ms300 = Duration::from_millis(300);
         let native_duration = NativeDuration::from(ms300);
