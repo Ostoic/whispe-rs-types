@@ -1,4 +1,5 @@
-///
+#![cfg(windows)]
+
 use winapi::shared::{
     minwindef::ULONG,
     ntdef::{BOOLEAN, HANDLE, LIST_ENTRY, PVOID, SHORT, UNICODE_STRING},

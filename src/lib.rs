@@ -1,4 +1,4 @@
-#![cfg(windows)]
+#![cfg(nightly)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![feature(
     min_specialization,
@@ -19,14 +19,16 @@ pub mod ntapi_ext;
 pub mod handle;
 
 pub mod ntstatus;
-
 pub use ntstatus::NtStatus;
 
+#[cfg(windows)]
 pub mod native_duration;
 
+#[cfg(windows)]
 pub use native_duration::NativeDuration;
 
 pub mod types {
+    #[cfg(windows)]
     pub use ntapi::*;
 }
 
