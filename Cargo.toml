@@ -4,12 +4,11 @@ version = "0.2.1"
 edition = "2021"
 
 [features]
-default = ["alloc"]
+default = ["std"]
 std = ["alloc"]
 alloc = []
-unsafe_conversions = []
 nosym = []
-win = ["windows-sys", "winapi", "ntapi"]
+unsafe_conversions = []
 
 [dependencies]
 obfstr = "0.4"
@@ -26,22 +25,19 @@ default-features = false
 version = "0.7"
 default-features = false
 
-[dependencies.ntapi]
+[target.'cfg(target_os="windows")'.dependencies.ntapi]
 version = "0.4"
 features = ["impl-default"]
 default-features = false
-optional = true
 
-[dependencies.winapi]
+[target.'cfg(target_os="windows")'.dependencies.winapi]
 version = "0.3"
 features = ["minwinbase", "windef"]
-optional = true
 
-[dependencies.windows-sys]
+[target.'cfg(target_os="windows")'.dependencies.windows-sys]
 version = "0.48"
 features = ["Win32_Foundation"]
 default-features = false
-optional = true
 
 [dev-dependencies]
 anyhow = "1"
