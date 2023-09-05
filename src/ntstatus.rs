@@ -2405,32 +2405,8 @@ pub enum NtStatus {
     STATUS_VSM_DMA_PROTECTION_NOT_IN_USE = 0xC0450001u32 as _,
 }
 
-/// These were implemented manualy because the derive proc macro causes a compiler bug to occur.
-/// Manual implementation of bincode::Encode
-#[cfg(feature = "bincode")]
-impl bincode::Encode for NtStatus {
-    fn encode<E: bincode::enc::Encoder>(
-        &self,
-        encoder: &mut E,
-    ) -> Result<(), bincode::error::EncodeError> {
-        bincode::Encode::encode(&self.bits(), encoder)
-    }
-}
-
-/// Manual implementation of bincode::Decode
-#[cfg(feature = "bincode")]
-impl bincode::Decode for NtStatus {
-    fn decode<D: bincode::de::Decoder>(
-        decoder: &mut D,
-    ) -> Result<Self, bincode::error::DecodeError> {
-        let decoded_u32 = u32::decode(decoder)?;
-        Ok(unsafe { core::mem::transmute(decoded_u32) })
-    }
-}
-
 #[repr(u32)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
 #[derive(Copy, Clone, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive)]
 pub enum NtStatusKind {
     Success = 0,

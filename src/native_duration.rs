@@ -39,29 +39,6 @@ impl PartialOrd for NativeDuration {
     }
 }
 
-#[cfg(feature = "bincode")]
-impl bincode::Encode for NativeDuration {
-    fn encode<E: bincode::enc::Encoder>(
-        &self,
-        encoder: &mut E,
-    ) -> Result<(), bincode::error::EncodeError> {
-        bincode::Encode::encode(unsafe { self.0.QuadPart() }, encoder)
-    }
-}
-
-#[cfg(feature = "bincode")]
-impl bincode::Decode for NativeDuration {
-    fn decode<D: bincode::de::Decoder>(
-        decoder: &mut D,
-    ) -> Result<Self, bincode::error::DecodeError> {
-        let large_int: LARGE_INTEGER = unsafe { core::mem::transmute(i64::decode(decoder)?) };
-        Ok(Self(large_int))
-    }
-}
-
-#[cfg(feature = "bincode")]
-bincode::impl_borrow_decode!(NativeDuration);
-
 impl NativeDuration {
     #[inline]
     pub fn as_ptr(&self) -> *const LARGE_INTEGER {
