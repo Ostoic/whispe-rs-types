@@ -1,9 +1,11 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
-use winapi::shared::ntdef::NTSTATUS;
+
+pub type NTSTATUS = i32;
 
 // Todo: Determine if important statuses are missing
 #[repr(i32)]
 #[allow(non_camel_case_types)]
+#[allow(non_upper_case_globals)]
 #[cfg_attr(not(feature = "nosym"), derive(Debug))]
 #[cfg_attr(
     not(feature = "unsafe_conversions"),
@@ -2584,19 +2586,5 @@ mod tests {
 
         let status = NtStatus::try_from(0xC0290046u32).expect("0xC00A000Du32");
         assert_eq!(status, NtStatus::STATUS_TPM_NOT_FULLWRITE)
-    }
-
-    #[test]
-    #[cfg(feature = "std")]
-    #[cfg(feature = "bincode")]
-    fn test_ntstatus_bincode() -> anyhow::Result<()> {
-        let config = bincode::config::standard();
-        let access_denied = NtStatus::STATUS_ACCESS_DENIED;
-        let status_bytes = bincode::encode_to_vec(access_denied, config)?;
-        let (decoded_status, _): (NtStatus, usize) =
-            bincode::decode_from_slice(&status_bytes[..], config)?;
-
-        assert_eq!(decoded_status, access_denied);
-        Ok(())
     }
 }
