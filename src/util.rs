@@ -1,7 +1,7 @@
 use core::{iter::zip, ops::Range};
 use widestring::{U16CStr, Utf16Str};
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 use winapi::shared::ntdef::UNICODE_STRING;
 
 #[inline]
@@ -23,7 +23,7 @@ pub const fn min(x: usize, y: usize) -> usize {
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 #[inline]
 pub fn convert_unicode_unchecked(s: &UNICODE_STRING) -> Option<&Utf16Str> {
     unsafe { U16CStr::from_ptr_truncate(s.Buffer as _, s.Length as _) }
@@ -32,13 +32,14 @@ pub fn convert_unicode_unchecked(s: &UNICODE_STRING) -> Option<&Utf16Str> {
 }
 
 // TODO: Consider making .0 private and providing conversions
-#[cfg(target_os = "windows")]
+
+#[cfg(windows)]
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct UnicodeString(pub UNICODE_STRING);
 
 #[cfg(not(feature = "nosym"))]
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 impl core::fmt::Debug for UnicodeString {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let c_str = unsafe { U16CStr::from_ptr(self.0.Buffer, self.0.Length as _) };
@@ -51,14 +52,14 @@ impl core::fmt::Debug for UnicodeString {
 }
 
 #[cfg(not(feature = "nosym"))]
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 impl core::fmt::Display for UnicodeString {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         <Self as core::fmt::Debug>::fmt(self, f)
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 impl<'a> TryFrom<UnicodeString> for &'a Utf16Str {
     type Error = widestring::error::Utf16Error;
 
@@ -68,7 +69,7 @@ impl<'a> TryFrom<UnicodeString> for &'a Utf16Str {
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 impl From<UNICODE_STRING> for UnicodeString {
     #[inline]
     fn from(value: UNICODE_STRING) -> Self {
@@ -76,7 +77,7 @@ impl From<UNICODE_STRING> for UnicodeString {
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 impl From<UnicodeString> for UNICODE_STRING {
     #[inline]
     fn from(value: UnicodeString) -> Self {
@@ -99,7 +100,7 @@ where
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 impl<Other: IntoIterator<Item = char>> EqIgnoreAsciiCase<Other> for UnicodeString {
     #[inline]
     fn eq_ignore_ascii_case(self, other: Other) -> bool {
@@ -116,7 +117,6 @@ mod tests {
     use crate::util::{interp, EqIgnoreAsciiCase};
 
     #[test]
-    #[cfg(target_os = "windows")]
     fn test_eq_ignore_ascii_case() {
         assert!("Bongour".chars().eq_ignore_ascii_case("bongour".chars()));
         assert!(widestring::utf16str!("Testo")
@@ -134,7 +134,6 @@ mod tests {
         assert_eq!(3, interp(4, 1..6, 0..5));
     }
 
-    #[cfg(test)]
     #[test]
     fn test_const_min() {
         use crate::util::min;

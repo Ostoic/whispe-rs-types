@@ -7,11 +7,14 @@ on:
     branches: 
       - main
 
+env:
+  CARGO_NIGHTLY_TOOLCHAIN: nightly-2023-09-05
+
 jobs:
-  check:
+  test-windows:
     strategy:
       matrix:
-        features: ["std,bincode", "nosym", "alloc,bincode"]
+        features: ["std", "nosym", "alloc", "unsafe_conversions"]
         target: [x86_64-pc-windows-gnu]
 
     name: Run tests
@@ -25,12 +28,38 @@ jobs:
         with:
           override: true
           profile: minimal
-          toolchain: nightly
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
           target: ${{ matrix.target }}
 
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          toolchain: nightly
-          args: --lib --target=${{ matrix.target }} --features=${{ matrix.features }}
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
+          args: --target=${{ matrix.target }} --features=${{ matrix.features }}
+  test-linux:
+    strategy:
+      matrix:
+        features: ["std", "nosym", "alloc", "unsafe_conversions"]
+        target: [x86_64-unknown-linux-gnu]
+
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
+          target: ${{ matrix.target }}
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
+          args: --target=${{ matrix.target }} --features=${{ matrix.features }}

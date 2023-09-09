@@ -1,11 +1,17 @@
 name: Run linters
-on: push
+on: 
+  push:
+  pull_request:
+
+env:
+  CARGO_NIGHTLY_TOOLCHAIN: nightly-2023-09-05
 
 jobs:
   check:
     strategy:
       matrix:
-        features: ["std,bincode", "nosym", "alloc,bincode"]
+        target: [x86_64-pc-windows-gnu, x86_64-unknown-linux-gnu]
+        features: ["std", "nosym", "alloc", "unsafe_conversions"]
 
     name: Run clippy
     runs-on: ubuntu-latest
@@ -18,12 +24,19 @@ jobs:
         with:
           override: true
           profile: minimal
-          toolchain: nightly
-          target: x86_64-pc-windows-gnu
-          components: clippy
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
+          target: ${{ matrix.target }}
+          components: clippy,rustfmt
+
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
 
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --features=${{ matrix.features }}
+          toolchain: ${{ env.CARGO_NIGHTLY_TOOLCHAIN }}
+          args: --features=${{ matrix.features }} --target=${{ matrix.target }}

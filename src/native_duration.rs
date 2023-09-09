@@ -1,3 +1,5 @@
+#![cfg(windows)]
+
 use core::time::Duration;
 
 use winapi::um::winnt::LARGE_INTEGER;
@@ -37,29 +39,6 @@ impl PartialOrd for NativeDuration {
     }
 }
 
-#[cfg(feature = "bincode")]
-impl bincode::Encode for NativeDuration {
-    fn encode<E: bincode::enc::Encoder>(
-        &self,
-        encoder: &mut E,
-    ) -> Result<(), bincode::error::EncodeError> {
-        bincode::Encode::encode(unsafe { self.0.QuadPart() }, encoder)
-    }
-}
-
-#[cfg(feature = "bincode")]
-impl bincode::Decode for NativeDuration {
-    fn decode<D: bincode::de::Decoder>(
-        decoder: &mut D,
-    ) -> Result<Self, bincode::error::DecodeError> {
-        let large_int: LARGE_INTEGER = unsafe { core::mem::transmute(i64::decode(decoder)?) };
-        Ok(Self(large_int))
-    }
-}
-
-#[cfg(feature = "bincode")]
-bincode::impl_borrow_decode!(NativeDuration);
-
 impl NativeDuration {
     #[inline]
     pub fn as_ptr(&self) -> *const LARGE_INTEGER {
@@ -96,21 +75,6 @@ mod tests {
     use core::time::Duration;
 
     use crate::NativeDuration;
-
-    #[test]
-    #[cfg(feature = "std")]
-    #[cfg(feature = "bincode")]
-    fn test_duration_bincode() -> anyhow::Result<()> {
-        let bincode_config = bincode::config::standard();
-
-        let duration = NativeDuration::from(Duration::from_secs(2));
-        let duration_bytes = bincode::encode_to_vec(&duration, bincode_config)?;
-        let (decoded_duration, _): (NativeDuration, usize) =
-            bincode::decode_from_slice(&duration_bytes, bincode_config)?;
-
-        assert_eq!(decoded_duration, duration);
-        Ok(())
-    }
 
     #[test]
     fn test_duration_conversions() {

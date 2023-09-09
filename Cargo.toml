@@ -1,53 +1,42 @@
 [package]
-name = "whispe-rs_types"
-version = "0.2.0"
+name = "whispe-rs-types"
+version = "0.2.1"
 edition = "2021"
 
 [features]
 default = ["alloc"]
-std = ["alloc", "bincode?/std"]
-alloc = ["bincode?/alloc"]
-unsafe_conversions = []
+std = ["alloc"]
+alloc = []
 nosym = []
+unsafe_conversions = []
 
 [dependencies]
 obfstr = "0.4"
 
-[dependencies.ntapi]
-version = "0.4"
-features = ["impl-default"]
-default-features = false
-
-[dependencies.winapi]
-version = "0.3"
-features = ["minwinbase", "windef"]
-# default-features = false
-
 [dependencies.bitflags]
 version = "2.0"
 default-features = false
-
-[dependencies.windows-sys]
-version = "0.48"
-features = [
-    "Win32_Foundation",
-    # "Win32_UI_WindowsAndMessaging",
-]
-default-features = false
-
-[dependencies.bincode]
-version = "2.0.0-rc.2"
-features = ["derive", "alloc"]
-git = "https://github.com/bincode-org/bincode"
-default-features = false
-optional = true
 
 [dependencies.widestring]
 version = "1"
 default-features = false
 
 [dependencies.num_enum]
-version = "0.6"
+version = "0.7"
+default-features = false
+
+[target.'cfg(windows)'.dependencies.ntapi]
+version = "0.4"
+features = ["impl-default"]
+default-features = false
+
+[target.'cfg(windows)'.dependencies.winapi]
+version = "0.3"
+features = ["minwinbase", "windef"]
+
+[target.'cfg(windows)'.dependencies.windows-sys]
+version = "0.48"
+features = ["Win32_Foundation"]
 default-features = false
 
 [dev-dependencies]
