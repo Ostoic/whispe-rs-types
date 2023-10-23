@@ -16,6 +16,7 @@ extern crate alloc;
 pub mod ntapi_ext;
 
 pub mod handle;
+pub use handle::{AsRawHandle, FromRawHandle, Handle, NonNullHandle};
 
 pub mod ntstatus;
 pub use ntstatus::NtStatus;
